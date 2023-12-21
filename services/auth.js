@@ -1,10 +1,10 @@
-const JWT_SECRET_KEY="4OZIrPbabg1OeuGLvEKDXCpkY6lsgrHOjZo9cJSVvTfXgtfAV6F1WyJs3PjISUbplrXowsUtxaCFIcrtCkDOqr3oj5IE498ZOT8kFhUck2aJHuKplzJlCaoJJWex7gfw"
+const JWT_SECRET_KEY = process.env.JWT_SECRET;
 
 const { func } = require("joi");
 const jwt = require("jsonwebtoken");
 function getUserJwt(id, email, name, role, expDays = 7) {
     const tokenData = {
-        uid: id,
+        sub: id,
         email: email,
         name: name,
         role: role,
@@ -21,12 +21,18 @@ function getUserJwt(id, email, name, role, expDays = 7) {
 
 }
 // MIDDLEWARE FOR AUTH COOKIE CHECK
-function checkAuthCookie(req, res, nex){
+function checkAuthCookie(req, res, next) {
     const token = req.cookies["auth"];
     console.log("COOKIE CHECK", token);
 
-    const result = jwt.verify(token, JWT_SECRET_KEY);
-    console.log("TOKEN CHECK", result);
+    let result;
+    try {
+        result = jwt.verify(token, JWT_SECRET_KEY);
+    } catch (error) {
+        next();
+    }
+    req.user = result;
+    next();
 }
 
 module.exports = {

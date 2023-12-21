@@ -7,6 +7,7 @@ router.get("/", function(req, res, next) {
   res.render("index");
 });
 router.get("/protected", checkAuthCookie, function(req, res, next) {
+  console.log(req.user);
   res.send("done");
 });
 
