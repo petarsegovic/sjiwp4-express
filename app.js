@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-router.use(parseAuthCookie());
+app.use(parseAuthCookie);
 
 // ROUTERS SETUP
 app.use('/', indexRouter);
@@ -42,6 +42,9 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+  if (err.status === 404) {
+    res.locals.message = "Tražena stranica nije pronađena";
+  }
 
   // render the error page
   res.status(err.status || 500);

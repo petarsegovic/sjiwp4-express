@@ -5,6 +5,12 @@ const { db } = require("../services/db.js");
 const { getUserJwt } = require("../services/auth.js");
 const bcrypt = require("bcrypt");
 
+// GET /users/signout
+router.get("/signout", function (req, res, next) {
+  res.clearCookie(process.env.ATUH_COOKIE_NAME);
+  res.redirect("/");
+});
+
 // GET /users/signin
 router.get("/signin", function (req, res, next) {
   res.render("users/signin", { result: { display_form: true } });
@@ -40,7 +46,7 @@ router.post("/signin", function (req, res, next) {
     }
 
     const token = getUserJwt(dbResult.id, dbResult.email, dbResult.name, dbResult.role);
-    res.cookie("auth", token);
+    res.cookie(process.env.ATUH_COOKIE_NAME, token);
 
     res.render("users/signin", { result: { success: true } });
   } else {
