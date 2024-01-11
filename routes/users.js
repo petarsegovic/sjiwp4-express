@@ -70,10 +70,16 @@ router.post("/signup", function (req, res, next) {
     return;
   }
 
-  const passwordHash = bcrypt.hashSync(req.body.password, 10);
+  const stmt1 = db.prepare("SELECT * FROM users WHERE email =?;");
+  const selectResult = stmt1.get(req.body.email);
+  if (selectResult) {
+    res.render("users/signup", { result: { email_in_use: true, display_form: true } });
+    return;
+  }
 
-  const stmt = db.prepare("INSERT INTO users (email, password, name, signed_at, role) VALUES (?, ?, ?, ?, ?);");
-  const insertResult = stmt.run(req.body.email, passwordHash, req.body.name, Date.now(), "user");
+  const passwordHash = bcrypt.hashSync(req.body.password, 10);
+  const stmt2 = db.prepare("INSERT INTO users (email, password, name, signed_at, role) VALUES (?, ?, ?, ?, ?);");
+  const insertResult = stmt2.run(req.body.email, passwordHash, req.body.name, Date.now(), "user");
 
   if (insertResult.changes && insertResult.changes === 1) {
     res.render("users/signup", { result: { success: true } });

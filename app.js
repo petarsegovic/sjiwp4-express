@@ -8,6 +8,8 @@ const { engine } = require("express-handlebars");
 // ROUTERS IMPORT
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const copmetitionsRouter = require('./routes/competitions');
+const { parseAuthCookie } = require('./services/auth');
 
 // APP INIT
 const app = express();
@@ -23,10 +25,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+router.use(parseAuthCookie());
 
 // ROUTERS SETUP
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/competitions', copmetitionsRouter);
 
 // 404 > ERROR HANDLER
 app.use(function (req, res, next) {
