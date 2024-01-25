@@ -1,6 +1,8 @@
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
+const { func } = require("joi");
 const jwt = require("jsonwebtoken");
+const {db} = require("./db.js");
 
 function getUserJwt(id, email, name, role, expDays = 7) {
     const tokenData = {
@@ -40,8 +42,20 @@ function parseAuthCookie(req, res, next) {
     next();
 }
 
+function checkEmailUique(email){
+    const stmt = db.prepare("SELECT count(*) FROM users WHERE email= ?;");
+    const result = stmt.get(email);
+
+    if (result["count(*)"] >= 1) {
+        return false;
+    }else{
+        return true;
+    }
+}
+
 module.exports = {
     getUserJwt,
     authRequired,
-    parseAuthCookie
+    parseAuthCookie,
+    checkEmailUique
 };
