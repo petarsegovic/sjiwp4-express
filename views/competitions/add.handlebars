@@ -1,0 +1,41 @@
+<div class="p-2">
+    {{#if result.display_form}}
+    <form action="/competitions/add" method="post" class="flex flex-col gao-2">
+        <div class="pb-2 flex flex-col">
+            <label>Naziv</label>
+            <input type="text" name="name" class="bg-neutral" required="" minlength="3" maxlength="50">
+        </div>
+        <div class="pb-2 flex flex-col">
+            <label>Opis</label>
+            <textarea name="description" class="bg-neutral" required="" rows="10" minlength="3"></textarea>
+        </div>
+        <div class="pb-2 flex flex-col">
+            <label>Rok prijave</label>
+            <input type="datetime-local" name="apply_till" class="bg-neutral" required="">
+        </div>
+        {{> form_buttons}}
+    </form>
+    {{/if}}
+
+    {{#if result.validation_error}}
+    {{> validation_error}}
+    {{/if}}
+    {{#if result.database_error}}
+    {{> database_error}}
+    {{/if}}
+    {{#if result.success}}
+    <div class="mt-4">
+        <div class="card w-96 bg-primary text-primary-content">
+            <div class="card-body">
+                <h2 class="card-title">Uspjeh!</h2>
+                <p>
+                    Uspješno ste se dodali natjecanje!
+                </p>
+                <div class="card-actions justify-end">
+                    <a class="btn" href="/competitions">Nastavi na pregled natjecanja</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+</div>
