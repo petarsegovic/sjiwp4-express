@@ -1,17 +1,22 @@
 <div class="p-2">
     {{#if result.display_form}}
-    <form action="/competitions/add" method="post" class="flex flex-col gap-2">
+    <form action="/competitions/{{#if result.edit}}edit{{/if}}{{#unless result.edit}}add{{/unless}}" method="post"
+        class="flex flex-col gap-2">
         <div class="pb-2 flex flex-col">
             <label>Naziv</label>
-            <input type="text" name="name" class="bg-neutral" required="" minlength="3" maxlength="50" />
+            <input type="text" name="name" class="bg-neutral" required="" minlength="3" maxlength="50" {{#if
+                result.edit}}value="{{result.edit.name}}" {{/if}} />
         </div>
-        <div class="pb-2 flex flex-col">
+        <div class="pb-2 flex flex-col" x-data="{}">
             <label>Opis</label>
-            <textarea name="description" class="bg-neutral" rows="10" required="" minlength="3"></textarea>
+            <textarea name="description" class="bg-neutral" rows="10" required="" minlength="3" {{#if
+                result.edit}}x-text="'{{result.edit.description}}'" {{/if}}>
+            </textarea>
         </div>
         <div class="pb-2 flex flex-col">
             <label>Rok prijave</label>
-            <input type="datetime-local" name="apply_till" class="bg-neutral" required="" />
+            <input type="datetime-local" name="apply_till" class="bg-neutral" required="" {{#if
+                result.edit}}value="{{result.edit.apply_till}}" {{/if}} />
         </div>
         {{> form_buttons }}
     </form>

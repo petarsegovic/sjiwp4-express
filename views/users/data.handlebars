@@ -3,26 +3,30 @@
     <form method="post" action="/users/data" class="flex flex-col gap-2">
         <div class="flex flex-col">
             <label>Ime i prezime</label>
-            <input type="text" name="name" value="{{user.name}}" class="bg-neutral">
+            <input type="text" name="name" value="{{user.name}}" class="bg-neutral" />
         </div>
         <div class="flex flex-col">
-            <label>Email adresa</label>
-            <input type="email" name="email" value="{{user.email}}" class="bg-neutral">
+            <label>E-mail adresa</label>
+            <input type="email" name="email" value="{{user.email}}" class="bg-neutral" />
         </div>
         <div class="flex flex-col">
             <label>Zaporka</label>
-            <input type="password" name="password" class="bg-neutral">
+            <input type="password" name="password" class="bg-neutral" />
         </div>
-        {{> form_buttons}}
+        {{> form_buttons }}
     </form>
     {{/if}}
 
     {{#if result.validation_error}}
-    {{> validation_error}}
+    {{> validation_error }}
     {{/if}}
 
     {{#if result.database_error}}
-    {{> database_error}}
+    {{> database_error }}
+    {{/if}}
+
+    {{#if result.email_in_use}}
+    {{> email_in_use}}
     {{/if}}
 
     {{#if result.success}}
@@ -31,10 +35,9 @@
             <div class="card-body">
                 <h2 class="card-title">Uspjeh!</h2>
                 <p>
-                    Uspješno ste se promijenili podatke, sada ćemo vas odjaviti!
+                    Uspješno ste promijenili podatke, sada ćemo vas odjaviti!
                 </p>
-                <div class="card-actions justify-end">
-                </div>
+                <div class="card-actions justify-end"></div>
             </div>
         </div>
         <script>
@@ -43,8 +46,5 @@
             }, 3000);
         </script>
     </div>
-    {{/if}}
-    {{#if result.email_in_use}}
-    {{> email_in_use}}
     {{/if}}
 </div>
