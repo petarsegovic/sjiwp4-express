@@ -18,6 +18,9 @@
             <input type="datetime-local" name="apply_till" class="bg-neutral" required="" {{#if
                 result.edit}}value="{{result.edit.apply_till}}" {{/if}} />
         </div>
+        {{#if result.edit}}
+        <input type="hidden" name="id" value="{{result.edit.id}}">
+        {{/if}}
         {{> form_buttons }}
     </form>
     {{/if}}
