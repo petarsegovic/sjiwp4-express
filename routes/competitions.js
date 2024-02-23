@@ -115,5 +115,17 @@ router.post("/add", adminRequired, function (req, res, next) {
         res.render("competitions/form", { result: { database_error: true } });
     }
 });
-
-module.exports = router;
+// GET /competitions/apply
+router.get("/apply", function (req, res, next) {
+    const stmt = db.prepare(`
+    SELECT id_apply, name, email, date
+    FROM users u
+    WHERE id_apply = u.id
+    ORDER BY date
+    `);
+     
+    const result = stmt.all();
+    res.render("competitions/apply", { result: { items: result } });
+    
+  });
+  module.exports = router;
