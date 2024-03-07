@@ -68,17 +68,17 @@ const schema_edit = Joi.object({
 });
 // GET /competitions/edit
 router.post("/edit", adminRequired, function (req, res, next) {
-     // do validation
-     const result = schema_edit.validate(req.body);
-     if (result.error) {
-         res.render("competitions/form", { result: { validation_error: true, display_form: true } });
-         return;
-     }
+    // do validation
+    const result = schema_edit.validate(req.body);
+    if (result.error) {
+        res.render("competitions/form", { result: { validation_error: true, display_form: true } });
+        return;
+    }
 
-     const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, apply_till = ? WHERE id = ?;");
-     const updateResult = stmt.run(req.body.name, req.body.description, req.body.apply_till, req.body.id);
+    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, apply_till = ? WHERE id = ?;");
+    const updateResult = stmt.run(req.body.name, req.body.description, req.body.apply_till, req.body.id);
 
-     if (updateResult.changes && updateResult.changes === 1) {
+    if (updateResult.changes && updateResult.changes === 1) {
         res.redirect("/competitions");
     } else {
         res.render("competitions/form", { result: { database_error: true } });
@@ -118,15 +118,15 @@ router.post("/add", adminRequired, function (req, res, next) {
 
 // GET /competitions/apply/:id
 router.get("/apply/:id", function (req, res, next) {
-     
+
     // do validation
-     const result = schema_id.validate(req.params);
+    const result = schema_id.validate(req.params);
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
 
-     const stmt = db.prepare("INSERT INTO apply (id_korisnik, id_natjecanje) VALUES (?, ?);");
-     const insertResult = stmt.run(req.user.sub, req.params.id);
+    const stmt = db.prepare("INSERT INTO apply (id_korisnik, id_natjecanje) VALUES (?, ?);");
+    const insertResult = stmt.run(req.user.sub, req.params.id);
 
     if (insertResult.changes && insertResult.changes === 1) {
         res.render("competitions/form", { result: { success: true } });
@@ -134,4 +134,24 @@ router.get("/apply/:id", function (req, res, next) {
         res.render("competitions/form", { result: { database_error: true } });
     }
 });
-  module.exports = router;
+// GET /competitions/applyed/:id
+router.get("/applyed/:id", adminRequired, function (req, res, next) {
+    // do validation
+    const result1 = schema_id.validate(req.params);
+    if (result1.error) {
+        throw new Error("Neispravan poziv");
+    }
+
+    const stmt = db.prepare(`
+    SELECT a.id, c.name as compName, u.name as korisnik, a.bodovi
+    FROM apply a, competitions c, users u
+    WHERE a.id_natjecanje = c.id and a.id_korisnik = u.id and a.id = ?
+    ORDER BY a.bodovi
+    `);
+
+    const result = stmt.all(req.params.id);
+
+    res.render("competitions/apply", { result: { items: result } });
+});
+
+module.exports = router;

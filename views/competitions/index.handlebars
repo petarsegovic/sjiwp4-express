@@ -35,6 +35,7 @@
                     <td class="flex flex-wrap gap-2">
                         <a href="/competitions/apply/{{this.id}}" class="btn btn-accent btn-xs">Prijava</a>
                         {{#if ../user.is_admin}}
+                        <a href="/competitions/applyed/{{this.id}}" class="btn btn-accent btn-xs">Prijavljeni</a>
                         <a href="/competitions/edit/{{this.id}}" class="btn btn-accent btn-xs">Uredi</a>
                         <a href="/competitions/delete/{{this.id}}" class="btn btn-error btn-xs">Briši</a>
                         {{/if}}
