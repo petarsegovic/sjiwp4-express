@@ -152,6 +152,50 @@ router.get("/applyed/:id", adminRequired, function (req, res, next) {
     const result = stmt.all(req.params.id);
 
     res.render("competitions/apply", { result: { items: result } });
+
 });
+// GET /competitions/bodovi/:id
+router.get("/bodovi/:id", adminRequired, function (req, res, next) {
+    // do validation
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
+
+    const stmt = db.prepare("SELECT * FROM applyed WHERE id = ?;");
+    const selectResult = stmt.get(req.params.id);
+
+    if (!selectResult) {
+        throw new Error("Neispravan poziv");
+    }
+
+    res.render("competitions/bodovi", { result: { display_form: true, edit: selectResult } });
+});
+ // SCHEMA bodovi
+ const schema_bodovi = Joi.object({
+    id: Joi.number().integer().positive().required(),
+    bodovi: Joi.number().min(1).max(50).required()
+});
+
+
+    // POST /competitions/bodovi
+router.post("/bodovi", adminRequired, function (req, res, next) {
+    // do validation
+    const result = schema_bodovi.validate(req.body);
+    if (result1.error) {
+        throw new Error("Neispravan poziv");
+    }
+
+    const stmt = db.prepare("UPDAE apply SET bodovi = ? WHERE id = ?");
+    const insertResult = stmt.run(req.body.bodovi, req.body.id);
+
+    if (insertResult.changes && insertResult.changes === 1) {
+        res.render("competitions/bodovi", { result: { success: true } });
+    } else {
+        res.render("competitions/bodovi", { result: { database_error: true } });
+    }
+});
+
+
 
 module.exports = router;
