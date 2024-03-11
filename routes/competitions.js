@@ -169,7 +169,7 @@ router.get("/bodovi/:id", adminRequired, function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
 
-    res.render("competitions/bodovi", { result: { display_form: true, edit: selectResult } });
+    res.render("competitions/bodovi", { result: { display_form: true, bodovi: selectResult } });
 });
  // SCHEMA bodovi
  const schema_bodovi = Joi.object({
@@ -182,11 +182,12 @@ router.get("/bodovi/:id", adminRequired, function (req, res, next) {
 router.post("/bodovi", adminRequired, function (req, res, next) {
     // do validation
     const result = schema_bodovi.validate(req.body);
+    console.log(result);
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
 
-    const stmt = db.prepare("UPDAE apply SET bodovi = ? WHERE id = ?");
+    const stmt = db.prepare("UPDATE apply SET bodovi = ? WHERE id = ?");
     const insertResult = stmt.run(req.body.bodovi, req.body.id);
 
     if (insertResult.changes && insertResult.changes === 1) {

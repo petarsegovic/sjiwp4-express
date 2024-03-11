@@ -4,7 +4,7 @@
         class="flex flex-col gap-2">
         <div class="pb-2 flex flex-col">
             <label>Bodovi</label>
-            <input type="text" name="name" class="bg-neutral" required="" minlength="1" maxlength="50" {{#if
+            <input type="text" name="bodovi" class="bg-neutral" required="" minlength="1" maxlength="50" {{#if
                 result.bodovi}}value="{{result.bodovi.bodovi}}" {{/if}}  />
         </div>
         {{/if}}
@@ -13,4 +13,28 @@
         <input type="hidden" name="id" value="{{result.bodovi.id}}">
         {{/if}}
     </form>
+    
+    {{#if result.validation_error}}
+    {{> validation_error }}
+    {{/if}}
+
+    {{#if result.database_error}}
+    {{> database_error }}
+    {{/if}}
+
+    {{#if result.success}}
+    <div class="mt-4">
+        <div class="card w-96 bg-primary text-primary-content">
+            <div class="card-body">
+                <h2 class="card-title">Uspjeh!</h2>
+                <p>
+                    Uspješno ste upisali bodove!
+                </p>
+                <div class="card-actions justify-end">
+                    <a class="btn" href="/competitions">Nastavi na pregled natjecanja</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
 </div>
