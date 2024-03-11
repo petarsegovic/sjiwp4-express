@@ -1,0 +1,16 @@
+<div class="p-2">
+    {{#if result.display_form}}
+    <form action="/competitions/bodovi" method="post"
+        class="flex flex-col gap-2">
+        <div class="pb-2 flex flex-col">
+            <label>Bodovi</label>
+            <input type="text" name="name" class="bg-neutral" required="" minlength="1" maxlength="50" {{#if
+                result.bodovi}}value="{{result.bodovi.bodovi}}" {{/if}}  />
+        </div>
+        {{/if}}
+        {{> form_buttons }}
+        {{#if result.bodovi}}
+        <input type="hidden" name="id" value="{{result.bodovi.id}}">
+        {{/if}}
+    </form>
+</div>

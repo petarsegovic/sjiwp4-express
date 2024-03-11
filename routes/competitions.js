@@ -162,7 +162,7 @@ router.get("/bodovi/:id", adminRequired, function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
 
-    const stmt = db.prepare("SELECT * FROM applyed WHERE id = ?;");
+    const stmt = db.prepare("SELECT * FROM apply WHERE id = ?;");
     const selectResult = stmt.get(req.params.id);
 
     if (!selectResult) {
@@ -182,7 +182,7 @@ router.get("/bodovi/:id", adminRequired, function (req, res, next) {
 router.post("/bodovi", adminRequired, function (req, res, next) {
     // do validation
     const result = schema_bodovi.validate(req.body);
-    if (result1.error) {
+    if (result.error) {
         throw new Error("Neispravan poziv");
     }
 
@@ -190,9 +190,9 @@ router.post("/bodovi", adminRequired, function (req, res, next) {
     const insertResult = stmt.run(req.body.bodovi, req.body.id);
 
     if (insertResult.changes && insertResult.changes === 1) {
-        res.render("competitions/bodovi", { result: { success: true } });
+        res.render("competitions/apply", { result: { success: true } });
     } else {
-        res.render("competitions/bodovi", { result: { database_error: true } });
+        res.render("competitions/apply", { result: { database_error: true } });
     }
 });
 
