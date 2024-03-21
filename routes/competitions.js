@@ -7,7 +7,7 @@ const { db } = require("../services/db.js");
 // GET /competitions
 router.get("/", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
-        SELECT c.id, c.name, c.description, u.name AS author, c.apply_till 
+        SELECT c.id, c.name, c.description, u.name AS author, c.apply_till
         FROM competitions c, users u
         WHERE c.author_id = u.id
         ORDER BY c.apply_till
@@ -30,7 +30,11 @@ router.get("/delete/:id", adminRequired, function (req, res, next) {
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
-    const stmt = db.prepare("DELETE FROM competitions WHERE id = ?;");
+
+    const stmt1 = db.prepare("DELETE FROM apply WHERE id_natjecanje=?;");
+    const deleteResult1 = stmt1.run(req.params.id);
+
+    const stmt = db.prepare("DELETE FROM competitions WHERE id=?;");
     const deleteResult = stmt.run(req.params.id);
 
     if (!deleteResult.changes || deleteResult.changes !== 1) {
@@ -152,7 +156,7 @@ router.get("/applyed/:id", adminRequired, function (req, res, next) {
     SELECT a.id, c.name as compName, u.name as korisnik, a.bodovi
     FROM apply a, competitions c, users u
     WHERE a.id_natjecanje = c.id and a.id_korisnik = u.id and c.id = ?
-    ORDER BY a.bodovi
+    ORDER BY a.bodovi DESC
     `);
 
     const result = stmt.all(req.params.id);
@@ -180,6 +184,7 @@ router.get("/bodovi/:id", adminRequired, function (req, res, next) {
 });
 // SCHEMA bodovi
 const schema_bodovi = Joi.object({
+    id_natjecanje: Joi.number().integer().positive().required(),
     id: Joi.number().integer().positive().required(),
     bodovi: Joi.number().min(1).max(50).required()
 });
@@ -193,12 +198,11 @@ router.post("/bodovi", adminRequired, function (req, res, next) {
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
-
-    const stmt = db.prepare("UPDATE apply SET bodovi = ? WHERE id = ?");
-    const insertResult = stmt.run(req.body.bodovi, req.body.id);
+    const stmt = db.prepare("UPDATE apply SET bodovi = ? WHERE id = ?;");
+    const insertResult = stmt.run(req.body.bodovi, req.body.id, req.params.id);
 
     if (insertResult.changes && insertResult.changes === 1) {
-        res.redirect("/competitions/applyed/" + req.body.id);
+        res.redirect("competitions/applyed/");
     } else {
         res.render("competitions/apply", { result: { database_error: true } });
     }
