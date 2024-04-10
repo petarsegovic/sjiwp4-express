@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { authRequired, adminRequired } = require("../services/auth.js");
+const { authRequired, adminRequired, checkEmailUnique } = require("../services/auth.js");
 const Joi = require("joi");
 const { db } = require("../services/db.js");
 
@@ -31,13 +31,15 @@ router.get("/delete/:id", adminRequired, function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
 
-    const stmt = db.prepare("DELETE FROM competitions WHERE id = ?;");
+    const stmt1 = db.prepare("DELETE FROM apply WHERE id_natjecanje=?;");
+    const deleteResult1 = stmt1.run(req.params.id);
+
+    const stmt = db.prepare("DELETE FROM competitions WHERE id=?;");
     const deleteResult = stmt.run(req.params.id);
 
     if (!deleteResult.changes || deleteResult.changes !== 1) {
         throw new Error("Operacija nije uspjela");
     }
-
     res.redirect("/competitions");
 });
 
@@ -48,7 +50,6 @@ router.get("/edit/:id", adminRequired, function (req, res, next) {
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
-
     const stmt = db.prepare("SELECT * FROM competitions WHERE id = ?;");
     const selectResult = stmt.get(req.params.id);
 
@@ -124,16 +125,25 @@ router.get("/apply/:id", function (req, res, next) {
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
+    const stmt1 = db.prepare("SELECT * FROM apply WHERE id_korisnik =? AND id_natjecanje = ?;");
+    const selectResult = stmt1.all(req.user.sub, req.params.id);
 
-    const stmt = db.prepare("INSERT INTO apply (id_korisnik, id_natjecanje) VALUES (?, ?);");
-    const insertResult = stmt.run(req.user.sub, req.params.id);
+    if (selectResult.length > 0) {
+        throw new Error("Već ste prijavljeni!");
+    }
+    else {
 
-    if (insertResult.changes && insertResult.changes === 1) {
-        res.render("competitions/form", { result: { success: true } });
-    } else {
-        res.render("competitions/form", { result: { database_error: true } });
+        const stmt = db.prepare("INSERT INTO apply (id_korisnik, id_natjecanje) VALUES (?, ?);");
+        const insertResult = stmt.run(req.user.sub, req.params.id);
+
+        if (insertResult.changes && insertResult.changes === 1) {
+            res.render("competitions/form", { result: { success: true } });
+        } else {
+            res.render("competitions/form", { result: { database_error: true } });
+        }
     }
 });
+
 // GET /competitions/applyed/:id
 router.get("/applyed/:id", adminRequired, function (req, res, next) {
     // do validation
@@ -145,8 +155,8 @@ router.get("/applyed/:id", adminRequired, function (req, res, next) {
     const stmt = db.prepare(`
     SELECT a.id, c.name as compName, u.name as korisnik, a.bodovi
     FROM apply a, competitions c, users u
-    WHERE a.id_natjecanje = c.id and a.id_korisnik = u.id and a.id = ?
-    ORDER BY a.bodovi
+    WHERE a.id_natjecanje = c.id and a.id_korisnik = u.id and c.id = ?
+    ORDER BY a.bodovi DESC
     `);
 
     const result = stmt.all(req.params.id);
@@ -171,14 +181,14 @@ router.get("/bodovi/:id", adminRequired, function (req, res, next) {
 
     res.render("competitions/bodovi", { result: { display_form: true, bodovi: selectResult } });
 });
- // SCHEMA bodovi
- const schema_bodovi = Joi.object({
+// SCHEMA bodovi
+const schema_bodovi = Joi.object({
     id: Joi.number().integer().positive().required(),
     bodovi: Joi.number().min(1).max(50).required()
 });
 
 
-    // POST /competitions/bodovi
+// POST /competitions/bodovi
 router.post("/bodovi", adminRequired, function (req, res, next) {
     // do validation
     const result = schema_bodovi.validate(req.body);
@@ -191,10 +201,30 @@ router.post("/bodovi", adminRequired, function (req, res, next) {
     const insertResult = stmt.run(req.body.bodovi, req.body.id);
 
     if (insertResult.changes && insertResult.changes === 1) {
-        res.render("competitions/apply", { result: { success: true } });
+        res.redirect("/competitions/applyed/" + req.body.id);
     } else {
         res.render("competitions/apply", { result: { database_error: true } });
     }
+});
+// GET /competitions/print/:id
+router.get("/print/:id", adminRequired, function (req, res, next) {
+    // do validation
+    const result1 = schema_id.validate(req.params);
+    if (result1.error) {
+        throw new Error("Neispravan poziv");
+    }
+
+    const stmt = db.prepare(`
+    SELECT a.id, c.name as compName, u.name as korisnik, a.bodovi
+    FROM apply a, competitions c, users u
+    WHERE a.id_natjecanje = c.id and a.id_korisnik = u.id and c.id = ?
+    ORDER BY a.bodovi DESC
+    `);
+
+    const result = stmt.all(req.params.id);
+
+    res.render("competitions/print", { result: { items: result } });
+
 });
 
 

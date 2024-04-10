@@ -1,0 +1,27 @@
+<div class="p-2">
+    <div class="overflow-x-auto">
+        <table class="table">
+            <!-- head -->
+               
+            <h1>{{this.compName}}</h1>
+
+            
+            <thead>
+                <tr>
+                    <th>Redni broj</th>
+                    <th>Ime</th>
+                    <th>Bodovi</th>
+                </tr>
+            </thead>
+            <!-- body -->
+            <tbody>
+                    {{#each result.items}}
+                <tr>
+                    <td></td>
+                    <td>{{this.korisnik}}</td>
+                    <td>{{this.bodovi}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+</div>
