@@ -223,7 +223,7 @@ router.get("/print/:id", adminRequired, function (req, res, next) {
 
     const result = stmt.all(req.params.id);
 
-    res.render("competitions/print", { result: { items: result } });
+    res.render("competitions/print", { result: { items: result, competitionName: result[0].compName } });
 
 });
 

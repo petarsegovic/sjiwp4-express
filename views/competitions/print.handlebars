@@ -1,9 +1,10 @@
 <div class="p-2">
+    <div class="text-center">
+            <h1 class="text-5xl font-bold">{{result.competitionName}}</h1>
+    </div>
     <div class="overflow-x-auto">
         <table class="table">
             <!-- head -->
-               
-            <h1>{{this.compName}}</h1>
 
             
             <thead>
@@ -17,7 +18,7 @@
             <tbody>
                     {{#each result.items}}
                 <tr>
-                    <td></td>
+                    <td>{{@index }}</td>
                     <td>{{this.korisnik}}</td>
                     <td>{{this.bodovi}}</td>
                 </tr>
