@@ -10,6 +10,7 @@ const { parseAuthCookie } = require('./services/auth');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const competitonsRouter = require('./routes/competitions');
+const seminariRouter = require('./routes/seminari');
 
 // APP INIT
 const app = express();
@@ -33,6 +34,7 @@ app.use(parseAuthCookie);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/competitions', competitonsRouter);
+app.use('/seminari', seminariRouter);
 
 // 404 > ERROR HANDLER
 app.use(function (req, res, next) {
